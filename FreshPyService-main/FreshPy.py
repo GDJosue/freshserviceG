@@ -80,6 +80,12 @@ class FreshPy():
         except(KeyError):
             return None
 
+    #------------------- Encuestas de satisfaccion al cliente -------------------#
+
+    def getAnswer(self, ticket_id):
+        uri = self.root_uri + '/tickets/' + str(ticket_id) + '/csat_response'
+        response = self._get(uri)
+        return response.json()['csat_response']
 
     #------------------- Tickets Calls -------------------#
     # arg:
