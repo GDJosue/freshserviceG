@@ -3,21 +3,29 @@ import datetime
 import matplotlib.pyplot as plt
 
 def main():
-    # initiate class
+    # Credenciales del portal web
     api_key = 'rSkqfcvIaeSD1uVLVunk'
     FreshService_domain = 'https://camen-q.freshservice.com/'
     FS = FreshPy(api_key, FreshService_domain)
 
+    #Se obtienen los tickets de la pagina web
     tickets = FS.all_tickets()
 
+    #se establece la fecha para la toma de los tickers
     fecha_limite = datetime.datetime(2023, 5, 1)
+
+    #Se establecen las categorias a tomarse en cuenta para el grafico
     sub_category = ['Computadora', 'Impresoras', 'Celular', 'Telefono', 'Perifericos', 'Red', 'MS Office',
                     'Adobe Reader', 'Correo Electronico','Alpha ERP','Windows','Chrome','Ring Central','Biometrico'
                     'Otro Sotware','Acceso a internet','Red lenta','Tarjeta de red','Grabaciones','Monitoreo']
 
+    #Contador de los tickets
     count = {}
+
+    #revision de los tickers para su categorización
     for ticket in tickets:
-        if 'sub_category' in ticket and ticket['sub_category'] in sub_category and datetime.datetime.strptime(ticket.get("created_at"), '%Y-%m-%dT%H:%M:%SZ') >= fecha_limite:
+        if 'sub_category' in ticket and ticket['sub_category'] in sub_category and datetime.datetime.strptime(ticket.get
+        ("created_at"), '%Y-%m-%dT%H:%M:%SZ') >= fecha_limite:
             if ticket['sub_category'] in count:
                 count[ticket['sub_category']] += 1
             else:
