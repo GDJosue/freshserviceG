@@ -1,70 +1,77 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QComboBox, QPushButton
-import matplotlib.pyplot as plt
-import datetime
-from FreshPy import *
+import tkinter as tk
+from tkinter import messagebox
+from tkcalendar import DateEntry
+from PIL import Image, ImageTk
+from C_Tickets import *
 
+def consultar():
+    opcion_seleccionada = opcion_var.get()
+    fecha_inicio = fecha_inicio_cal.get_date()
+    fecha_fin = fecha_fin_cal.get_date()
 
-class ReportGenerator(QMainWindow):
-    def __init__(self):
-        super().__init__()
+    if opcion_seleccionada == "Departamento":
+        # Realizar la consulta por departamento
+        consulta = f"Consulta por departamento\nFecha inicio: {fecha_inicio}\nFecha fin: {fecha_fin}"
+        modulo.departamentos(fecha_fin, fecha_inicio)
 
-        self.setWindowTitle('Generador de Reportes')
-        self.setGeometry(100, 100, 400, 300)
+    elif opcion_seleccionada == "Subcategoría":
+        # Realizar la consulta por subcategoría
+        consulta = f"Consulta por subcategoría\nFecha inicio: {fecha_inicio}\nFecha fin: {fecha_fin}"
+        modulo.categorias(fecha_fin, fecha_inicio)
 
-        # create label
-        self.label = QLabel('Seleccione una subcategoría:', self)
-        self.label.move(20, 20)
+    elif opcion_seleccionada == "Prioridad":
+        # Realizar la consulta por subcategoría
+        consulta = f"Consulta por subcategoría\nFecha inicio: {fecha_inicio}\nFecha fin: {fecha_fin}"
+        modulo.prioridad(fecha_fin, fecha_inicio)
 
-        # create combobox
-        self.combobox = QComboBox(self)
-        self.combobox.move(20, 50)
-        self.combobox.resize(200, 30)
+    else:
+        # No se seleccionó ninguna opción
+        messagebox.showwarning("Error", "Selecciona una opción válida")
+        return
 
-        # add options to combobox
-        sub_category = ['Computadora', 'Impresoras', 'Celular', 'Telefono', 'Perifericos', 'Red', 'MS Office',
-                        'Adobe Reader', 'Correo Electronico','Alpha ERP','Windows','Chrome','Ring Central','Biometrico',
-                        'Otro Sotware','Acceso a internet','Red lenta','Tarjeta de red','Grabaciones','Monitoreo']
-        self.combobox.addItems(sub_category)
+modulo = C_Tickets()
 
-        # create button
-        self.button = QPushButton('Generar Reporte', self)
-        self.button.move(20, 100)
-        self.button.clicked.connect(self.generate_report)
+# Crear la ventana principal
+window = tk.Tk()
+window.title("Interfaz de Consulta")
+window.geometry("400x300")
 
-    def generate_report(self):
-        # get selected subcategory from combobox
-        sub_category = self.combobox.currentText()
+# Cargar y mostrar la imagen en la parte superior derecha
+image = Image.open("camenQ.png")
+image = image.resize((100, 100))  # Ajusta el tamaño de la imagen según tus necesidades
+image_tk = ImageTk.PhotoImage(image)
+image_label = tk.Label(window, image=image_tk)
+image_label.pack(anchor=tk.NE)
 
-        # import class
-        api_key = 'rSkqfcvIaeSD1uVLVunk'
-        FreshService_domain = 'https://camen-q.freshservice.com/'
-        FS = FreshPy(api_key, FreshService_domain)
+# Radio buttons para seleccionar la opción
+opcion_var = tk.StringVar()
+opcion_var.set("Departamento")
 
-        # get all tickets
-        tickets = FS.all_tickets()
+departamento_radio = tk.Radiobutton(window, text="Departamento", variable=opcion_var, value="Departamento")
+departamento_radio.pack()
 
-        # count tickets by subcategory
-        count = {}
-        for ticket in tickets:
-            if 'sub_category' in ticket and ticket['sub_category'] == sub_category:
-                if ticket['status'] in count:
-                    count[ticket['status']] += 1
-                else:
-                    count[ticket['status']] = 1
+subcategoria_radio = tk.Radiobutton(window, text="Subcategoría", variable=opcion_var, value="Subcategoría")
+subcategoria_radio.pack()
 
-        # plot pie chart
-        fig, ax = plt.subplots()
-        ax.pie(count.values(), labels=count.keys(), autopct='%1.1f%%')
-        ax.axis('equal')
-        ax.set_title(f'Tickets por subcategoría: {sub_category}')
+prioridad_radio = tk.Radiobutton(window, text="Prioridad", variable=opcion_var, value="Prioridad")
+prioridad_radio.pack()
 
-        # show plot
-        plt.show()
+# Campos de fecha con calendarios emergentes
+fecha_inicio_label = tk.Label(window, text="Fecha de inicio:")
+fecha_inicio_label.pack()
 
+fecha_inicio_cal = DateEntry(window, date_pattern="yyyy/mm/dd")
+fecha_inicio_cal.pack()
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    window = ReportGenerator()
-    window.show()
-    sys.exit(app.exec_())
+fecha_fin_label = tk.Label(window, text="Fecha de fin:")
+fecha_fin_label.pack()
+
+fecha_fin_cal = DateEntry(window, date_pattern="yyyy/mm/dd")
+fecha_fin_cal.pack()
+
+# Botón de consulta
+consulta_button = tk.Button(window, text="Consultar", command=consultar)
+consulta_button.pack()
+
+# Iniciar el bucle principal de la ventana
+window.mainloop()

@@ -84,8 +84,29 @@ class FreshPy():
 
     def getAnswer(self, ticket_id):
         uri = self.root_uri + '/tickets/' + str(ticket_id) + '/csat_response'
+        print(uri)
         response = self._get(uri)
+        print(response)
         return response.json()['csat_response']
+
+    def getAllAnswer(self):
+        uri = self.root_uri + '/surveys/satisfaction_ratings'
+        print(uri)
+        response = self._get(uri)
+        print(response)
+        return response.json()['satisfaction_ratings']
+
+    def encuentas(self):
+        uri = self.root_uri + '/surveys'
+        print(uri)
+        response = self._get(uri)
+        return response.json()['survey']
+
+    def encuentasActivas(self):
+        uri = self.root_uri + '/surveys?active=true'
+        print(uri)
+        response = self._get(uri)
+        return response.json()['survey']
 
     #------------------- Tickets Calls -------------------#
     # arg:

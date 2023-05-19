@@ -32,6 +32,7 @@ def main():
                 count[ticket['sub_category']] += 1
             else:
                 count[ticket['sub_category']] = 1
+            print(ticket)
 
     fig, ax = plt.subplots()
 
