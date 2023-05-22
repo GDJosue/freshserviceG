@@ -59,7 +59,9 @@ class C_Tickets():
                 count[depto_id] += 1
                 tickets_por_departamento[depto_id].append(ticket['id'])
         # Crear tabla de tickets por departamento
-        table_data = [[departamentos_dict[depto_id], len(tickets), ', '.join(map(str, tickets[:5])) + '...' if len(tickets) > 5 else ', '.join(map(str, tickets))] for depto_id, tickets in tickets_por_departamento.items()]
+        table_data = [[departamentos_dict[depto_id], len(tickets), ', '.join(map(str, tickets[:5])) + '...'
+            if len(tickets) > 5 else ', '.join(map(str, tickets))] for depto_id, tickets
+                in tickets_por_departamento.items()]
         # Graficar los resultados en una gráfica de pastel junto con los labels
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
         # Calcula la suma total de elementos
@@ -92,33 +94,29 @@ class C_Tickets():
             4: 'Urgente'
         }
         # Contador de los tickets
-        count = {}
+        count = {p: 0 for p in prioridad}
+
         # Revisión de los tickets para su categorización
         for ticket in self.tickets:
-            if (
-                    ticket.get('priority') is not None and
-                    ticket['priority'] in prioridad and
-                    fecha_limite_superior >= datetime.datetime.strptime(ticket.get("created_at"),
-                    '%Y-%m-%dT%H:%M:%SZ').date() >= fecha_limite_inferior
-            ):
-                if ticket['priority'] in count:
-                    count[ticket['priority']] += 1
-                else:
-                    count[ticket['priority']] = 1
+            created_at = datetime.datetime.strptime(ticket.get("created_at"), '%Y-%m-%dT%H:%M:%SZ').date()
+            if ticket.get('priority') in prioridad and fecha_limite_superior >= created_at >= fecha_limite_inferior:
+                count[ticket['priority']] += 1
+
         fig, ax = plt.subplots()
         # Calcula la suma total de elementos
         total = sum(count.values())
         # Agrega la gráfica de pastel con porcentaje relativo
-        ax.pie(count.values(), labels=[etiquetas[p] for p in count.keys()], autopct='%1.1f%%')
+        ax.pie(count.values(), labels=[etiquetas[p] for p in prioridad], autopct='%1.1f%%')
         # Agrega un label con el total de elementos
         ax.text(0, -1.1, f'Total: {total}', fontsize=12, ha='center')
         ax.axis('equal')
         ax.set_title(
             'Tickets por prioridad desde el ' + str(fecha_limite_inferior) + ' al ' + str(fecha_limite_superior))
+
         # Crea una lista de strings con el valor real
-        percentages = [f'{value}' for key, value in count.items()]
+        percentages = [f'{value}' for value in count.values()]
         # Agrega los porcentajes como labels en la leyenda
-        legend_labels = [f'{etiquetas[key]}: {percentages[i]}' for i, key in enumerate(count.keys())]
+        legend_labels = [f'{etiquetas[prioridad[i]]}: {percentages[i]}' for i in range(len(prioridad))]
         legend = ax.legend(legend_labels, loc='center left', bbox_to_anchor=(1, 0.5))
         plt.setp(legend.get_title(), fontsize=12)
         plt.subplots_adjust(right=0.6)
