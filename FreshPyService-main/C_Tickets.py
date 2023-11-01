@@ -4,7 +4,7 @@ from tabulate import tabulate
 from collections import defaultdict
 import datetime
 class C_Tickets():
-    api_key = 'sCcA1K0EQhvuJH0OVgec'
+    api_key = 'api'
     FreshService_domain = 'https://camen-q.freshservice.com/'
     FS = FreshPy(api_key, FreshService_domain)
     # Se obtienen los tickets de la página web
